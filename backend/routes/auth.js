@@ -5,12 +5,11 @@ const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Register route
 router.post('/register', [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('role').optional().isIn(['admin', 'user']).withMessage('Role must be either admin or user'),
+  body('role').optional().isIn(['user', 'admin']).withMessage('Role must be user or admin'),
 ], register);
 
 router.post('/login', [

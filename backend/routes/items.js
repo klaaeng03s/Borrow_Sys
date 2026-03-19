@@ -12,7 +12,7 @@ router.get('/', getItems);
 router.get('/:id', getItemById);
 
 router.post('/', authorizeAdmin, [
-  body('name').trim().notEmpty().withMessage('Name is required'),
+  body('name').trim().notEmpty().withMessage('Item name is required'),
   body('category').trim().notEmpty().withMessage('Category is required'),
   body('quantity').isInt({ min: 0 }).withMessage('Quantity must be a non-negative integer'),
 ], createItem);

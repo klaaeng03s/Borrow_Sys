@@ -1,10 +1,9 @@
 const { validationResult } = require('express-validator');
 const db = require('../config/db');
-const { search } = require('../routes/auth');
 
 const getBorrows = async (req, res, next) => {
   try {
-    const { status, page = 1, limit = 10 } = req.query;
+    const { status, page = 1, limit = 10, search } = req.query;
     const isAdmin = req.user.role === 'admin';
 
     const pageNum = parseInt(page) || 1;
@@ -31,9 +30,10 @@ const getBorrows = async (req, res, next) => {
 
     const whereClause = conditions.join(' AND ');
 
+    // ✅ COUNT
     const countQuery = `
       SELECT COUNT(*) as total
-      FROM borrows_records br
+      FROM borrow_records br
       JOIN users u ON br.user_id = u.id
       JOIN items i ON br.item_id = i.id
       WHERE ${whereClause}
@@ -42,14 +42,15 @@ const getBorrows = async (req, res, next) => {
     const [countRows] = await db.execute(countQuery, params);
     const total = countRows[0].total;
 
+    // ✅ DATA (แก้ตรงนี้)
     const dataQuery = `
       SELECT br.*, u.name as borrower_name, u.email as borrower_email,
-              i.name as item_name, i.category as item_category
-      FROM borrows_records br
+             i.name as item_name, i.category as item_category
+      FROM borrow_records br
       JOIN users u ON br.user_id = u.id
       JOIN items i ON br.item_id = i.id
       WHERE ${whereClause}
-      ORDER BY br.borrow_date DESC
+      ORDER BY br.created_at DESC
       LIMIT ${limitNum} OFFSET ${offset}
     `;
 
@@ -67,20 +68,20 @@ const getBorrows = async (req, res, next) => {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error(err); // 🔥 debug
     next(err);
   }
 };
 
 const getBorrowById = async (req, res, next) => {
   try {
-    const [row] = await db.execute(
+    const [rows] = await db.execute(
       `SELECT br.*, u.name as borrower_name, u.email as borrower_email, i.name as item_name, i.category as item_category FROM borrow_records br JOIN users u ON br.user_id = u.id JOIN items i ON br.item_id = i.id WHERE br.id = ?`,
       [req.params.id]
     );
-    if (row.length === 0) return res.status(404).json({ success: false, message: 'Borrow record not found' });
-    const record = row[0];
-    if (req.user.role !== 'admin' && record.user_id !== req.user.id) return res.status(403).json({ success: false, message: 'Access denied' });
+    if (rows.length === 0) return res.status(404).json({ success: false, message: 'Record not found.' });
+    const record = rows[0];
+    if (req.user.role !== 'admin' && record.user_id !== req.user.id) return res.status(403).json({ success: false, message: 'Access denied.' });
     res.json({ success: true, data: record });
   } catch (err) { next(err); }
 };

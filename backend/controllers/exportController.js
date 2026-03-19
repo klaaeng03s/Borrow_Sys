@@ -1,6 +1,7 @@
 const PDFDocument = require('pdfkit');
 const db = require('../config/db');
 
+// GET /api/export/pdf
 const exportPDF = async (req, res, next) => {
   try {
     const isAdmin = req.user.role === 'admin';
@@ -8,8 +9,8 @@ const exportPDF = async (req, res, next) => {
 
     let query = `
       SELECT br.*, u.name as borrower_name, u.email as borrower_email,
-              i.name as item_name, i.category as item_category
-      FROM borrows_records br
+             i.name as item_name, i.category as item_category
+      FROM borrow_records br
       JOIN users u ON br.user_id = u.id
       JOIN items i ON br.item_id = i.id
       WHERE 1=1
@@ -20,39 +21,40 @@ const exportPDF = async (req, res, next) => {
       query += ' AND br.user_id = ?';
       params.push(req.user.id);
     }
-
     if (status) {
       query += ' AND br.status = ?';
       params.push(status);
     }
-
     if (from) {
       query += ' AND br.borrow_date >= ?';
       params.push(from);
     }
-
     if (to) {
       query += ' AND br.borrow_date <= ?';
       params.push(to);
     }
-    
     query += ' ORDER BY br.created_at DESC';
 
     const [records] = await db.execute(query, params);
 
+    // Build PDF
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=borrow_report.pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="borrow-report.pdf"');
     doc.pipe(res);
 
+    // ---- Header ----
     doc.rect(0, 0, doc.page.width, 80).fill('#1a1a2e');
-    doc.fillColor('#e8c547').fontSize(22).font('Helvetica-Bold').text('BORROWING & RETURN REPORT', 50, 28);
-    doc.fillColor('#ffffff').fontSize(10).font('Helvetica').text(`Generated: ${new Date().toLocaleString()}`, 50, 56);
+    doc.fillColor('#e8c547').fontSize(22).font('Helvetica-Bold')
+      .text('BORROWING & RETURN REPORT', 50, 28);
+    doc.fillColor('#ffffff').fontSize(10).font('Helvetica')
+      .text(`Generated: ${new Date().toLocaleString()}`, 50, 56);
 
     doc.moveDown(3);
     doc.fillColor('#1a1a2e');
 
+    // ---- Summary ----
     const borrowed = records.filter(r => r.status === 'borrowed').length;
     const returned = records.filter(r => r.status === 'returned').length;
 
