@@ -1,0 +1,180 @@
+# 📦 Borrowing System (Full-Stack Web App)
+
+A full-stack web application for managing item borrowing and returning with authentication and role-based access control.
+
+---
+
+## 🚀 Features
+
+### 👤 User
+
+- Register & Login (JWT Authentication)
+- View available items
+- Borrow items
+- Return items
+
+### 🛠️ Admin
+
+- Add / Edit / Delete items
+- View all borrowing records
+
+---
+
+## 🧑‍💻 Tech Stack
+
+### Frontend
+
+- React.js
+- Axios
+- React Router
+
+### Backend
+
+- Node.js
+- Express.js
+- MySQL
+- JWT (jsonwebtoken)
+- bcryptjs
+
+---
+
+## 📁 Project Structure
+
+```
+borrow-system/
+│
+├── backend/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── routes/
+│   ├── models/
+│   ├── init.sql   ← database setup file
+│   └── server.js
+│
+├── frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── components/
+│   │   └── services/
+│
+└── README.md
+```
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone repository
+
+```
+git clone https://github.com/your-username/borrow-system.git
+cd borrow-system
+```
+
+---
+
+### 2. Setup Backend
+
+```
+cd backend
+npm install
+```
+
+Create `.env` file:
+
+```
+PORT=5000
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=borrow_sys
+JWT_SECRET=your_secret_key
+```
+
+Start backend:
+
+```
+npm run dev
+```
+
+---
+
+### 3. Setup Database (MySQL using init.sql)
+
+Instead of manually creating tables, use the provided `init.sql` file.
+
+#### Option 1: Using MySQL CLI
+```
+mysql -u root -p < init.sql
+```
+
+#### Option 2: Using MySQL Workbench
+1. Open MySQL Workbench
+2. Open `init.sql`
+3. Click **Run**
+
+---
+
+### 4. Setup Frontend
+
+```
+cd frontend
+npm install
+npm start
+```
+
+---
+
+## 🔑 API Endpoints
+
+### Auth
+
+- POST `/api/auth/register`
+- POST `/api/auth/login`
+
+### Items
+
+- GET `/api/items`
+
+### Borrow
+
+- POST `/api/borrows`
+- POST `/api/returns`
+
+---
+
+## 🔐 Authentication
+
+- Uses JWT Token
+- Token must be included in headers:
+
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## 📌 Notes
+
+- Make sure MySQL is running before starting backend
+- Backend runs on `http://localhost:5000`
+- Database is initialized via `init.sql`
+
+---
+
+## 🧠 Future Improvements
+
+- UI/UX improvements
+- Image upload for items
+- Notifications system
+- Deployment (Docker / Cloud)
+
+---
+
+## 👨‍💻 Author
+
+- Thanadol Yungkong
+
+---
+
