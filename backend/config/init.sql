@@ -1,6 +1,6 @@
 -- Create and use the database
-CREATE DATABASE IF NOT EXISTS borrow_system;
-USE borrow_system;
+CREATE DATABASE IF NOT EXISTS borrow_sys;
+USE borrow_sys;
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
@@ -42,10 +42,6 @@ CREATE TABLE IF NOT EXISTS borrow_records (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
 );
-
--- Sample admin user (password: Admin@123)
-INSERT IGNORE INTO users (name, email, password, role) VALUES 
-('Administrator', 'admin@system.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQyCMRMeFa4YrJQkpn.z9Wkue', 'admin');
 
 -- Sample items
 INSERT IGNORE INTO items (name, category, quantity, available_quantity, status, description) VALUES
